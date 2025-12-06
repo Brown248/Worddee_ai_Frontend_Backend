@@ -1,0 +1,55 @@
+{
+  "name": "Worddee AI Validator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "validate-sentence",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "prompt": "={{ $json.body.sentence }}",
+        "text": "Task: Check English sentence using word '{{ $json.body.word }}'.\nReturn JSON ONLY:\n{ \"score\": <0-10>, \"level\": \"<Beginner/Intermediate>\", \"suggestion\": \"...\", \"corrected_sentence\": \"...\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [480, 300],
+      "id": "openai-gpt",
+      "name": "OpenAI Evaluation",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_ID",
+          "name": "OpenAI Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [700, 300],
+      "id": "response-node",
+      "name": "Send JSON Response"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{ "node": "OpenAI Evaluation", "type": "main", "index": 0 }]] },
+    "OpenAI Evaluation": { "main": [[{ "node": "Send JSON Response", "type": "main", "index": 0 }]] }
+  }
+}
+
+

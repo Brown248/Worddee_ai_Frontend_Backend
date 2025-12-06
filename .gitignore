@@ -1,0 +1,6 @@
+#Backend
+venv
+
+#Frontend
+.next
+node_modules
