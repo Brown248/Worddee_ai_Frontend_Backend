@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from models.schemas import SentenceSubmission, AIResponse
 from utils.n8n_client import send_to_n8n
-from services.db import save_result  # Import DB Service
+from services.db import save_result
 
 router = APIRouter()
 
@@ -10,10 +10,10 @@ def validate_sentence(submission: SentenceSubmission):
     if not submission.sentence.strip():
         raise HTTPException(status_code=400, detail="Sentence cannot be empty")
 
-    # 1. ส่งให้ AI ตรวจผ่าน n8n
+    # 1. ส่งให้ AI ตรวจ
     result = send_to_n8n(submission.word, submission.sentence)
 
-    # 2. บันทึกลง Database จริง
+    # 2. บันทึกลง Database
     save_result(
         word=submission.word,
         score=result.get("score", 0),
