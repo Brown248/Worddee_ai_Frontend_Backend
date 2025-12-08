@@ -7,14 +7,14 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['Times New Roman', 'serif'], // ใช้ Times New Roman ให้เหมือนดีไซน์
+        serif: ['Times New Roman', 'serif'], 
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
         brand: {
-          dark: '#1a3c3c',    // เขียวเข้ม
-          green: '#7a9e9f',   // เขียวกลาง
-          light: '#eefcf6',   // พื้นหลังเขียวอ่อนๆ
+          dark: '#1a3c3c',    
+          green: '#7a9e9f',   
+          light: '#eefcf6',  
           text: '#2d3748',
         }
       },

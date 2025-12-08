@@ -4,7 +4,6 @@ from models.schemas import WordResponse
 
 router = APIRouter()
 
-# คลังคำศัพท์ 10 คำ พร้อมภาพสวยๆ
 WORDS_DB = [
     {
         "word": "Runway",

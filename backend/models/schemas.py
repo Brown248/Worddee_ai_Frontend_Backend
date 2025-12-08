@@ -11,6 +11,7 @@ class WordResponse(BaseModel):
 class SentenceSubmission(BaseModel):
     word: str
     sentence: str
+    duration: Optional[float] = 0.0 
 
 class AIResponse(BaseModel):
     score: float

@@ -1,11 +1,11 @@
 'use client';
 
-import { WordData, AIResult } from '@/types'; // บรรทัดนี้จะหายแดงถ้าย้ายโฟลเดอร์ถูกต้อง
-import { useState, useEffect } from 'react';
+import { WordData, AIResult } from '@/types';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import FeedbackBox from '../components/FeedbackBox'; // เช็คว่าไฟล์นี้มีอยู่จริงด้วยนะครับ
+import FeedbackBox from '../components/FeedbackBox';
 
 const API_BASE = '/python-api'; 
 
@@ -14,6 +14,9 @@ export default function WordOfTheDay() {
   const [sentence, setSentence] = useState('');
   const [result, setResult] = useState<AIResult | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // ⏱️ ตัวแปรสำหรับจับเวลา (ใช้ useRef เพื่อไม่ให้ค่าหายตอนพิมพ์)
+  const startTime = useRef<number>(Date.now());
 
   useEffect(() => {
     fetchWord();
@@ -26,8 +29,11 @@ export default function WordOfTheDay() {
     setWord(null);
     try {
       const res = await axios.get(`${API_BASE}/word`);
-      // Fake delay เพื่อความสวยงามของ Animation
-      setTimeout(() => setWord(res.data), 500);
+      setTimeout(() => {
+          setWord(res.data);
+          // ⏱️ เริ่มนับเวลาใหม่ทันทีที่คำศัพท์ปรากฏ
+          startTime.current = Date.now();
+      }, 500);
     } catch (err) {
       console.error(err);
     }
@@ -36,10 +42,15 @@ export default function WordOfTheDay() {
   const submit = async () => {
     if (!word || !sentence.trim()) return;
     setLoading(true);
+
+    // ⏱️ คำนวณเวลาที่ใช้ไป (วินาที) = เวลาปัจจุบัน - เวลาเริ่ม / 1000
+    const durationInSeconds = (Date.now() - startTime.current) / 1000;
+
     try {
       const res = await axios.post(`${API_BASE}/validate-sentence`, {
         word: word.word,
-        sentence: sentence
+        sentence: sentence,
+        duration: durationInSeconds // ส่งเวลาไปด้วย
       });
       setResult(res.data);
     } catch (err) {
