@@ -1,15 +1,94 @@
-Worddee.aiเว็บแอปพลิเคชันสำหรับฝึกแต่งประโยคภาษาอังกฤษ พร้อมระบบ AI Feedback ผ่าน n8n และ Dashboard ติดตามผลโครงสร้างโปรเจกต์frontend/: Next.js App Routerbackend/: FastAPI Pythonautomations/: ไฟล์ JSON Workflow สำหรับ n8n🚀 วิธีการรันโปรเจกต์ (Getting Started)1. Backend (FastAPI)ต้องมี Python 3.9+เข้าไปที่โฟลเดอร์ backendcd backend
-สร้าง Virtual Environment (แนะนำ)python -m venv venv
+# Worddee.ai 🌍✍️
 
-# Windows
-venv\Scripts\activate
+เว็บแอปพลิเคชันสำหรับฝึกแต่งประโยคภาษาอังกฤษจากคำศัพท์รายวัน (Word of the Day) พร้อมระบบ AI Feedback ตรวจไวยากรณ์และให้คะแนนแบบเรียลไทม์ และ Dashboard ติดตามพัฒนาการของผู้เรียน
 
-# Mac/Linux
-source venv/bin/activate
-ติดตั้ง Dependenciespip install -r requirements.txt
-รัน Serveruvicorn main:app --reload
-Backend จะรันที่ http://localhost:80002. Frontend (Next.js)ต้องมี Node.js v18+เข้าไปที่โฟลเดอร์ frontendcd frontend
-ติดตั้ง Dependenciesnpm install
-รัน Development Servernpm run dev
-Frontend จะรันที่ http://localhost:30003. Automation (n8n)เพื่อให้ระบบ AI ทำงานได้จริง (ถ้าไม่ทำขั้นตอนนี้ Backend จะใช้ Mock AI ตอบกลับแทน):ติดตั้งและรัน n8n (ผ่าน Docker หรือ Desktop App)สร้าง Workflow ใหม่Import ไฟล์ automations/worddee-ai-workflow.json เข้าไปใน Node "OpenAI Chat Model": ให้ใส่ Credential Key ของ OpenAI ของคุณกด Execute Workflow หรือ Activateนำ URL ของ Webhook (เช่น http://localhost:5678/webhook/validate-sentence) ไปอัปเดตในไฟล์ backend/utils/n8n_client.py หรือสร้างไฟล์ .env ใน backend:N8N_WEBHOOK_URL=http://localhost:5678/webhook/validate-sentence
-📌 การใช้งานเปิด Browser ไปที่ http://localhost:3000คลิกเมนู Word of the Day เพื่อฝึกแต่งประโยคคลิกเมนู My Progress เพื่อดู Dashboard⚙️ Tech Stack DetailsFrontend: Next.js 14, TailwindCSS, Axios, RechartsBackend: FastAPI, PydanticAI Integration: n8n Webhook -> OpenAI GPT-4o-mini
+![Project Screenshot](frontend/public/screenshot.png)
+
+## ฟีเจอร์หลัก (Key Features)
+* **Word of the Day:** สุ่มคำศัพท์น่ารู้พร้อมความหมายและตัวอย่างประโยค
+* **AI Grammar Check:** ตรวจประโยคด้วย AI (Google Gemini) ผ่าน n8n ให้คะแนนและคำแนะนำทันที
+* **Real-time Timer:** จับเวลาที่ใช้ในการแต่งประโยคจริง เพื่อคำนวณชั่วโมงเรียนที่แม่นยำ
+* **Learner Dashboard:** กราฟแสดงพัฒนาการ (Score History) และสถิติการเรียน (Streak, Total Hours)
+* **Data Persistence:** บันทึกประวัติการเรียนลงฐานข้อมูลไฟล์ (TinyDB) ข้อมูลไม่หายเมื่อปิดเซิร์ฟเวอร์
+
+## Tech Stack
+* **Frontend:** Next.js 14, TailwindCSS, Framer Motion (Animation), Recharts (Graph)
+* **Backend:** FastAPI (Python), TinyDB (JSON Database)
+* **AI & Automation:** n8n Workflow, Google Gemini API
+
+---
+
+## วิธีติดตั้งและรันโปรเจกต์ (Installation)
+
+### 1. เตรียม Backend (FastAPI)
+ต้องมี Python 3.9+ ติดตั้งในเครื่อง
+
+1.  เข้าไปที่โฟลเดอร์ `backend`:
+    ```bash
+    cd backend
+    ```
+
+2.  สร้างและเปิดใช้งาน Virtual Environment:
+    ```bash
+    # Windows
+    python -m venv venv
+    venv\Scripts\activate
+
+    # Mac/Linux
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  ติดตั้ง Dependencies:
+    ```bash
+    pip install -r requirements.txt
+    pip install tinydb  # ติดตั้งฐานข้อมูลเพิ่ม
+    ```
+
+4.  สร้างไฟล์ `.env` ในโฟลเดอร์ `backend` และใส่ URL ของ n8n:
+    ```env
+    N8N_WEBHOOK_URL=http://localhost:5678/webhook/validate-sentence
+    ```
+
+5.  รัน Server Backend:
+    ```bash
+    python main.py
+    ```
+    *Backend จะรันอยู่ที่: `http://localhost:8000`*
+
+---
+
+### 2. เตรียม Frontend (Next.js)
+ต้องมี Node.js v18+ ติดตั้งในเครื่อง
+
+1.  เปิด Terminal ใหม่ แล้วเข้าไปที่โฟลเดอร์ `frontend`:
+    ```bash
+    cd frontend
+    ```
+
+2.  ติดตั้ง Dependencies:
+    ```bash
+    npm install
+    npm install framer-motion clsx tailwind-merge lucide-react axios
+    ```
+
+3.  รัน Development Server:
+    ```bash
+    npm run dev
+    ```
+    *Frontend จะรันอยู่ที่: `http://localhost:3000`*
+
+---
+
+### 3. ตั้งค่า AI (n8n Automation)
+ระบบใช้ **n8n** เป็นตัวกลางคุยกับ Google Gemini
+
+1.  ติดตั้งและเปิดโปรแกรม n8n (`npx n8n` หรือ Desktop App)
+2.  เปิด Browser ไปที่ `http://localhost:5678`
+3.  สร้าง Workflow ใหม่ และ Import ไฟล์จาก `automations/worddee-ai-workflow.json`
+4.  **ตั้งค่า Node "Google Gemini":**
+    * เลือก Credential เป็น Google Gemini API (ขอฟรีได้ที่ aistudio.google.com)
+    * เลือก Model: `gemini-1.5-flash` (แนะนำ)
+5.  **ตั้งค่า Node "Respond to Webhook":**
+    * ตรวจสอบว่าช่อง Response Body เป็น `{{ $json }}`
+6.  **สำคัญ:** กดปุ่ม **Active** (มุมขวาบนให้เป็นสีเขียว) เพื่อเปิดใช้งาน Workflow
