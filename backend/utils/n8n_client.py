@@ -3,7 +3,7 @@ import os
 import json
 
 def send_to_n8n(word: str, sentence: str):
-    webhook_url = os.getenv("N8N_WEBHOOK_URL", "http://localhost:5678/webhook-test/gen-word")
+    webhook_url = os.getenv("N8N_WEBHOOK_URL", "http://localhost:5678/webhook/Gen_word")
 
     payload = {
         "word": word,

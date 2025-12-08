@@ -1,25 +1,20 @@
 from fastapi import APIRouter
 from models.schemas import SummaryResponse
+from services.db import get_stats # Import DB Service
 
 router = APIRouter()
 
 @router.get("/summary", response_model=SummaryResponse)
 def get_summary():
-    # Mock Data ตาม UI Dashboard
+    # ดึงข้อมูลจริงที่คำนวณจาก Database
+    data = get_stats()
+    
     return {
         "stats": {
-            "day_streak": 1,
-            "hours_learned": 10,
-            "minutes_learned": 0,
-            "missions_completed": True
+            "day_streak": data["day_streak"],
+            "hours_learned": int(data["hours_learned"]), # convert float to int
+            "minutes_learned": int((data["hours_learned"] % 1) * 60),
+            "missions_completed": data["missions_completed"]
         },
-        "chart_data": [
-            {"name": "Day 1", "score": 6.5},
-            {"name": "Day 2", "score": 7.0},
-            {"name": "Day 3", "score": 6.8},
-            {"name": "Day 4", "score": 8.5},
-            {"name": "Day 5", "score": 7.5},
-            {"name": "Day 6", "score": 9.0},
-            {"name": "Day 7", "score": 8.5},
-        ]
+        "chart_data": data["chart_data"]
     }
